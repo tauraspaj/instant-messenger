@@ -268,7 +268,7 @@ public class loginSystem {
 				passwordHasher hasher = new passwordHasher();
 				String hashedPassword = hasher.generateHash(password);
 				
-				if (username == null || fullName == null || email == null || password == null) {
+				if (username.equals("") || fullName.equals("") || email.equals("") || password.equals("")) {
 					JOptionPane.showMessageDialog(frame, "Please fill out all the fields");
 				} else {
 					PreparedStatement ps;
