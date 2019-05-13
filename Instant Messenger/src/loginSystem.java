@@ -5,19 +5,24 @@ import java.awt.CardLayout;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 
 public class loginSystem {
 
 	private JFrame frame;
-	private JLabel lblLogUsername, lblLogPassword, lblRegUsername, lblRegPassword, lblRegEmail, lblRegConfirmPassword;
-	private JTextField txtLogUsername, txtRegUsername, txtRegEmail;
-	private JPasswordField txtLogPassword, txtRegPassword, txtRegConfirmPassword;
+	private JLabel lblLogUsername, lblLogPassword, lblRegUsername, lblRegPassword, lblRegEmail, lblRegFullName;
+	private JTextField txtLogUsername, txtRegUsername, txtRegEmail, txtRegFullName;
+	private JPasswordField txtLogPassword, txtRegPassword;
 	private JButton btnMenuLogin, btnMenuRegister, btnMenuExit, btnLogLogin, btnLogClear, btnLogBack, btnRegRegister, btnRegClear, btnRegBack;
 	private JPanel panelMenu, panelLogin, panelRegister;
 
@@ -58,7 +63,7 @@ public class loginSystem {
 		 */
 		
 		// Menu panel
-		final JPanel panelMenu = new JPanel();
+		JPanel panelMenu = new JPanel();
 		frame.getContentPane().add(panelMenu, "name_192629480929964");
 		
 		// Login panel
@@ -139,14 +144,48 @@ public class loginSystem {
 		
 		// Login button
 		JButton btnLogLogin = new JButton("Login");
+		btnLogLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String username = txtLogUsername.getText();
+				String password = String.valueOf(txtLogPassword.getPassword());
+				passwordHasher hasher = new passwordHasher();
+				String hashedPassword = hasher.generateHash(password);
+				
+				if (username.equals("") || password.equals("")) {
+					JOptionPane.showMessageDialog(frame, "Please fill out all the fields");
+				} else {
+					PreparedStatement ps;
+					String query = "SELECT `username`, `password_hash` FROM `users` WHERE `username` = '" + username + "'";
+					
+					try {
+						Connection conn = connectDb.getConnection();	
+						ps = conn.prepareStatement(query);
+						ResultSet r1= ps.executeQuery();
+						String checkUser;
+						String checkPassword;
+						
+						if (r1.next() == false) {
+							JOptionPane.showMessageDialog(frame, "This user does not exist");
+						} else {
+							checkUser = r1.getString("username");
+							checkPassword = r1.getString("password_hash");
+							if (checkUser.equals(username) && checkPassword.equals(hashedPassword)) {
+								 JOptionPane.showMessageDialog(frame, "You have successfully logged in!");
+								 mainApplication mainApp = new mainApplication();
+								 frame.dispose();
+								 mainApp.setVisible(true);
+							} else {
+								JOptionPane.showMessageDialog(frame, "Incorrect");
+							}
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
 		btnLogLogin.setFont(new Font("Lucida Grande", Font.BOLD, 24));
 		btnLogLogin.setBounds(18, 188, 120, 60);
-		/*
-		 * When the user successfully logins:
-		 * JOptionPane.showMessageDialog(frame, "You have successfully logged in!");
-		 * mainApplication mainApp = new mainApplication();
-		 * mainApplication.setVisible(true);
-		 */
 		panelLogin.add(btnLogLogin);
 		
 		// Clear button
@@ -198,28 +237,60 @@ public class loginSystem {
 		txtRegEmail.setBounds((450/2), 70, 120, 30);
 		panelRegister.add(txtRegEmail);
 				
+		// Full name label
+		JLabel lblRegFullName = new JLabel("Full name");
+		lblRegFullName.setBounds((450/2)-85, 110, 70, 30);
+		panelRegister.add(lblRegFullName);
+				
+		// Full name input
+		txtRegFullName = new JTextField();
+		txtRegFullName.setBounds((450/2), 110, 120, 30);
+		panelRegister.add(txtRegFullName);
+		
 		// Password label
 		JLabel lblRegPassword = new JLabel("Password");
-		lblRegPassword.setBounds((450/2)-85, 110, 70, 30);
+		lblRegPassword.setBounds((450/2)-85, 150, 126, 30);
 		panelRegister.add(lblRegPassword);
 				
 		// Password input
 		txtRegPassword = new JPasswordField();
-		txtRegPassword.setBounds((450/2), 110, 120, 30);
+		txtRegPassword.setBounds((450/2), 150, 120, 30);
 		panelRegister.add(txtRegPassword);
-		
-		// Confirm password label
-		JLabel lblRegConfirmPassword = new JLabel("Confirm Password");
-		lblRegConfirmPassword.setBounds(84, 150, 126, 30);
-		panelRegister.add(lblRegConfirmPassword);
-				
-		// Confirm password input
-		txtRegConfirmPassword = new JPasswordField();
-		txtRegConfirmPassword.setBounds((450/2), 150, 120, 30);
-		panelRegister.add(txtRegConfirmPassword);
 		
 		// Login button
 		JButton btnRegRegister = new JButton("Register");
+		btnRegRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String username = txtRegUsername.getText();
+				String fullName = txtRegFullName.getText();
+				String email = txtRegEmail.getText();
+				String password = String.valueOf(txtRegPassword.getPassword());
+				passwordHasher hasher = new passwordHasher();
+				String hashedPassword = hasher.generateHash(password);
+				
+				if (username == null || fullName == null || email == null || password == null) {
+					JOptionPane.showMessageDialog(frame, "Please fill out all the fields");
+				} else {
+					PreparedStatement ps;
+					String query = "INSERT INTO `users`(`username`, `full_name`, `email`, `password_hash`) "
+							+ "VALUES ('" + username + "','" + fullName + "','" + email + "','" + hashedPassword + "')";
+					
+					try {
+						Connection conn = connectDb.getConnection();	
+						ps = conn.prepareStatement(query);
+						
+						
+						if (ps.executeUpdate() > 0) {
+							JOptionPane.showMessageDialog(frame, "You have been registered");
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					} finally {
+						System.out.println("User registered");
+					}
+				}
+			}
+		});
 		btnRegRegister.setFont(new Font("Lucida Grande", Font.BOLD, 24));
 		btnRegRegister.setBounds(18, 188, 120, 60);
 		panelRegister.add(btnRegRegister);
@@ -230,8 +301,8 @@ public class loginSystem {
 			public void actionPerformed(ActionEvent e) {
 				txtRegUsername.setText("");
 				txtRegEmail.setText("");
+				txtRegFullName.setText("");
 				txtRegPassword.setText("");
-				txtRegConfirmPassword.setText("");
 			}
 		});
 		btnRegClear.setFont(new Font("Lucida Grande", Font.BOLD, 24));
