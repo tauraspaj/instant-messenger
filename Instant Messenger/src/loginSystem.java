@@ -270,6 +270,10 @@ public class loginSystem {
 				
 				if (username.equals("") || fullName.equals("") || email.equals("") || password.equals("")) {
 					JOptionPane.showMessageDialog(frame, "Please fill out all the fields");
+				} else if (!email.contains("@")) { 
+					JOptionPane.showMessageDialog(frame, "Please enter a valid email");
+				} else if (password.length() < 8) { 
+					JOptionPane.showMessageDialog(frame, "Your password must be at least 8 characters long");
 				} else {
 					PreparedStatement ps;
 					String query = "INSERT INTO `users`(`username`, `full_name`, `email`, `password_hash`) "
