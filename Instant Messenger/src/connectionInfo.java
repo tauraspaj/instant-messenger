@@ -1,4 +1,3 @@
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -8,7 +7,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 public class connectionInfo extends JFrame {
@@ -17,9 +15,12 @@ public class connectionInfo extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtName, txtAddress, txtPort;
 	private JLabel lblIpAddress, lblPort, lblAddressDesc, lblPortDesc;
+	
+	private String username;
 
-	public connectionInfo() {
+	public connectionInfo(String username) {
 		super("Chat room information");
+		this.username = username;
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -28,7 +29,7 @@ public class connectionInfo extends JFrame {
 		}
 		
 		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(300, 380);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
@@ -41,6 +42,7 @@ public class connectionInfo extends JFrame {
 		txtName.setBounds(67, 50, 165, 28);
 		contentPane.add(txtName);
 		txtName.setEditable(false);
+		txtName.setText(username);
 		txtName.setColumns(10);
 
 		JLabel lblName = new JLabel("Name:");
@@ -78,19 +80,12 @@ public class connectionInfo extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String address = txtAddress.getText();
 				int port = Integer.parseInt(txtPort.getText());
-				//login(name, address, port);
-				peerToPeer peerChat = new peerToPeer();
-				//setVisible(false);
-				//dispose();
+				peerToPeer peerChat = new peerToPeer(username, address, port);
+				setVisible(false);
+				dispose();
 			}
 		});
 		btnLogin.setBounds(91, 311, 117, 29);
 		contentPane.add(btnLogin);
 	}
-
-	/*
-	private void login(String name, String address, int port) {
-		dispose();
-		new ClientWindow(name, address, port);
-	}*/
 }

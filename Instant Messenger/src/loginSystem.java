@@ -171,7 +171,7 @@ public class loginSystem {
 							checkPassword = r1.getString("password_hash");
 							if (checkUser.equals(username) && checkPassword.equals(hashedPassword)) {
 								 JOptionPane.showMessageDialog(frame, "You have successfully logged in!");
-								 mainApplication mainApp = new mainApplication();
+								 mainApplication mainApp = new mainApplication(username);
 								 frame.dispose();
 								 mainApp.setVisible(true);
 							} else {
