@@ -11,6 +11,7 @@ public class mainApplication extends JFrame {
 
 	private JPanel contentPane;
 	private String username;
+	private JButton btnAppP2P, btnAppExit;
 
 	/**
 	 * Launch the application.

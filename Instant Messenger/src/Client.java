@@ -15,9 +15,15 @@ public class Client {
 	private int ID = -1;
 
 	public Client(String name, String address, int port) {
-		this.name = name;
-		this.address = address;
-		this.port = port;
+		
+	    if (name == null || address == null || port <= 0) {
+	        throw new IllegalArgumentException("Incorrect values have been entered");
+	      } else {
+	  		this.name = name;
+			this.address = address;
+			this.port = port;
+	      }
+
 	}
 
 	public String getName() {
